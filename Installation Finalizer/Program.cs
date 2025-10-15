@@ -24,7 +24,7 @@ namespace Installation_Finalizer
             Console.WriteLine("|| [3] Restore old context menu       ||");
             Console.WriteLine("|| [4] Restore Modern context menu    ||");
             Console.WriteLine("|| [5] Power sleep state Standby (S3) ||");
-            Console.WriteLine("|| [6] System info summary            ||");
+            Console.WriteLine("|| [6] System info                    ||");
             Console.WriteLine("||                                    ||");
             Console.WriteLine("|| [9] Exit                           ||");
             Console.WriteLine("||                                    ||");
@@ -82,6 +82,7 @@ namespace Installation_Finalizer
             }
         }
 
+        // It works... I think
         static void RunRegWithElevation()
         {
             var args = "add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Power\" /v PlatformAoAcOverride /t REG_DWORD /d 0 /f";
@@ -90,8 +91,8 @@ namespace Installation_Finalizer
             {
                 FileName = "reg.exe",
                 Arguments = args,
-                UseShellExecute = true,   // elevation için true olmalı
-                Verb = "runas"            // UAC prompt
+                UseShellExecute = true,
+                Verb = "runas"
             };
 
             Process.Start(psi);
