@@ -51,7 +51,6 @@ namespace Installation_Finalizer
                 // Restores old context menu
                 case 3:
                     RegOperation("add \"HKCU\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32\" /f /ve");
-                    Console.WriteLine("(Restart Required)");
                     ResetConsole();
                     break;
                 // Restores modern context menu
@@ -134,6 +133,7 @@ namespace Installation_Finalizer
             string output = process.StandardOutput.ReadToEnd();
             string error = process.StandardError.ReadToEnd();
 
+            Process.Start("cmd.exe", "/c taskkill /f /im explorer.exe & start explorer.exe");
             Console.WriteLine("Output: " + output);
             Console.WriteLine("Error: " + error);
         }
