@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace Installation_Finalizer
 {
@@ -12,19 +11,23 @@ namespace Installation_Finalizer
 
         static void StartMenu()
         {
+            Console.Clear();
+
             Console.WriteLine("Welcome to Windows 11 Beta Edition Wizard!\n");
             Console.WriteLine(">> Please select your operation!\n");
             Console.WriteLine("========================================");
             Console.WriteLine("||                                    ||");
             Console.WriteLine("|| Windows Operations                 ||");
-            Console.WriteLine("|| [1] Activate Windows 11 version!   ||");
+            Console.WriteLine("|| [1] Activate Windows! (MassGrave)  ||");
             Console.WriteLine("|| [2] Install Microsoft Office!      ||");
             Console.WriteLine("||                                    ||");
             Console.WriteLine("|| Personalization                    ||");
-            Console.WriteLine("|| [3] Restore old context menu       ||");
-            Console.WriteLine("|| [4] Restore Modern context menu    ||");
-            Console.WriteLine("|| [5] Power sleep state Standby (S3) ||");
-            Console.WriteLine("|| [6] System info                    ||");
+            Console.WriteLine("|| [3] Restore Old Context Menu       ||");
+            Console.WriteLine("|| [4] Restore Modern Context Menu    ||");
+            Console.WriteLine("|| [5] Power Sleep State Standby (S3) ||");
+            Console.WriteLine("||                                    ||");
+            Console.WriteLine("|| Extra                              ||");
+            Console.WriteLine("|| [6] Show System Info               ||");
             Console.WriteLine("||                                    ||");
             Console.WriteLine("|| [9] Exit                           ||");
             Console.WriteLine("||                                    ||");
@@ -38,28 +41,33 @@ namespace Installation_Finalizer
             {
                 // Opens windows activation script
                 case 1:
+                    Console.Clear();
                     Console.WriteLine("\nRedirecting...");
                     UseShell("irm https://get.activated.win | iex");
                     ResetConsole();
                     break;
                 // Redirects to office install page
                 case 2:
+                    Console.Clear();
                     Console.WriteLine("\nRedirecting...");
                     RedirectOfficeInstallation();
                     ResetConsole();
                     break;
                 // Restores old context menu
                 case 3:
+                    Console.Clear();
                     RegOperation("add \"HKCU\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32\" /f /ve");
                     ResetConsole();
                     break;
                 // Restores modern context menu
                 case 4:
+                    Console.Clear();
                     RegOperation("delete \"HKCU\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\" /f");
                     ResetConsole();
                     break;
                 // Changes power sleep state to (S3)
                 case 5:
+                    Console.Clear();
                     RunRegWithElevation();
                     ResetConsole();
                     break;
@@ -76,6 +84,9 @@ namespace Installation_Finalizer
                 // Incorrect Entry
                 default:
                     Console.Clear();
+                    Console.WriteLine("\n'{0}' is not valid! Please try again!", selection);
+                    Console.WriteLine("Press any key to return...");
+                    Console.ReadKey();
                     StartMenu();
                     break;
             }
@@ -183,9 +194,6 @@ namespace Installation_Finalizer
             }
             else
             {
-                Console.WriteLine("\n'{0}' is not valid! Please try again!", input);
-                Console.WriteLine("Press any key to try again...");
-                Console.ReadKey();
                 number = 0;
                 return number;
             }
@@ -194,8 +202,8 @@ namespace Installation_Finalizer
         static void ResetConsole()
         {
             Console.WriteLine("Operation Done!");
+            Console.Write("\nPress any key to return...");
             Console.ReadKey();
-            Console.Clear();
             StartMenu();
         }
     }
