@@ -25,9 +25,10 @@ namespace Installation_Finalizer
             Console.WriteLine("|| [3] Restore Old Context Menu       ||");
             Console.WriteLine("|| [4] Restore Modern Context Menu    ||");
             Console.WriteLine("|| [5] Power Sleep State Standby (S3) ||");
+            Console.WriteLine("|| [6] Prevent ms-gamebar pop-up      ||");
             Console.WriteLine("||                                    ||");
             Console.WriteLine("|| Extra                              ||");
-            Console.WriteLine("|| [6] Show System Info               ||");
+            Console.WriteLine("|| [7] Show System Info               ||");
             Console.WriteLine("||                                    ||");
             Console.WriteLine("|| [9] Exit                           ||");
             Console.WriteLine("||                                    ||");
@@ -50,19 +51,21 @@ namespace Installation_Finalizer
                 case 2:
                     Console.Clear();
                     Console.WriteLine("\nRedirecting...");
-                    RedirectOfficeInstallation();
+                    OpenInWeb("https://gravesoft.dev/office_c2r_links");
                     ResetConsole();
                     break;
                 // Restores old context menu
                 case 3:
                     Console.Clear();
                     RegOperation("add \"HKCU\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32\" /f /ve");
+                    RestartExplorer();
                     ResetConsole();
                     break;
                 // Restores modern context menu
                 case 4:
                     Console.Clear();
                     RegOperation("delete \"HKCU\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\" /f");
+                    RestartExplorer();
                     ResetConsole();
                     break;
                 // Changes power sleep state to (S3)
@@ -71,8 +74,21 @@ namespace Installation_Finalizer
                     RunRegWithElevation();
                     ResetConsole();
                     break;
-                // Shows system info
+                // Ms-gamebar pop-up
                 case 6:
+                    Console.Clear();
+                    RegOperation("add \"HKCU\\Software\\Classes\\ms-gamebar\" /f /ve /d \"URL:ms-gamebar\"");
+                    RegOperation("add \"HKCU\\Software\\Classes\\ms-gamebar\" /f /v \"URL Protocol\" /d \"\"");
+                    RegOperation("add \"HKCU\\Software\\Classes\\ms-gamebar\" /f /v \"NoOpenWith\" /d \"\"");
+                    RegOperation("add \"HKCU\\Software\\Classes\\ms-gamebar\\shell\\open\\command\" /f /ve /d \"%SystemRoot%\\System32\\systray.exe\"");
+                    RegOperation("add \"HKCU\\Software\\Classes\\ms-gamebarservices\" /f /ve /d \"URL:ms-gamebarservices\"");
+                    RegOperation("add \"HKCU\\Software\\Classes\\ms-gamebarservices\" /f /v \"URL Protocol\" /d \"\"");
+                    RegOperation("add \"HKCU\\Software\\Classes\\ms-gamebarservices\" /f /v \"NoOpenWith\" /d \"\"");
+                    RegOperation("add \"HKCU\\Software\\Classes\\ms-gamebarservices\\shell\\open\\command\" /f /ve /d \"%SystemRoot%\\System32\\systray.exe\"");
+                    ResetConsole();
+                    break;
+                // Shows system info
+                case 7:
                     Console.Clear();
                     SystemInfo();
                     ResetConsole();
@@ -90,6 +106,11 @@ namespace Installation_Finalizer
                     StartMenu();
                     break;
             }
+        }
+
+        static void RestartExplorer()
+        {
+            Process.Start("cmd.exe", "/c taskkill /f /im explorer.exe & start explorer.exe");
         }
 
         // It works... I think
@@ -135,7 +156,7 @@ namespace Installation_Finalizer
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                CreateNoWindow = true
+                CreateNoWindow = false
             };
 
             var process = Process.Start(psi);
@@ -144,16 +165,15 @@ namespace Installation_Finalizer
             string output = process.StandardOutput.ReadToEnd();
             string error = process.StandardError.ReadToEnd();
 
-            Process.Start("cmd.exe", "/c taskkill /f /im explorer.exe & start explorer.exe");
             Console.WriteLine("Output: " + output);
             Console.WriteLine("Error: " + error);
         }
 
-        static void RedirectOfficeInstallation()
+        static void OpenInWeb(string link)
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "https://gravesoft.dev/office_c2r_links",
+                FileName = link,
                 UseShellExecute = true
             };
             Process.Start(psi);
@@ -161,7 +181,6 @@ namespace Installation_Finalizer
 
         static void UseShell(string command)
         {
-
             var psCommand = command;
 
             var psi = new ProcessStartInfo
@@ -182,19 +201,17 @@ namespace Installation_Finalizer
             Console.WriteLine("Out:\n" + stdout);
             if (!string.IsNullOrWhiteSpace(stderr))
                 Console.Error.WriteLine("Error:\n" + stderr);
-
         }
 
         static int ParseString(string input)
         {
             int number = 0;
-            if(Int32.TryParse(input, out number))
+            if(!Int32.TryParse(input, out number))
             {
                 return number;
             }
             else
             {
-                number = 0;
                 return number;
             }
         }
